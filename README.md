@@ -161,5 +161,5 @@ This will start the Next.js app at `http://localhost:3000`.
 Feel free to fork, submit PRs, and improve EazyEmailer!
 
 ## 📜 License
-MIT License © 2025 EazyEmailer
+Apache License © 2025 EazyEmailer
 
