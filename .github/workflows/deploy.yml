@@ -1,0 +1,80 @@
+name: Deploy Next.js App to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Next.js Server
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: production
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      APP_PATH: ${{ secrets.APP_PATH }}
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up SSH
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+          unset SSH_AUTH_SOCK  # Disable ssh-agent to ensure no other keys are used
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          ssh -o IdentitiesOnly=yes -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
+          
+          export APP_PATH="ezemailer"  # Export APP_PATH to the SSH session
+          echo "Using APP_PATH: \$APP_PATH"  # Debug to ensure it's passed correctly
+          
+          # Update system packages
+          sudo yum update -y
+
+          # Install Git
+          if ! command -v git &> /dev/null; then
+            sudo yum install -y git
+          fi
+
+          # Ensure APP_PATH exists
+          if [ -z "$APP_PATH" ]; then
+            echo "APP_PATH is not set. Exiting."
+            exit 1
+          fi
+          mkdir -p "$APP_PATH"
+          cd "$APP_PATH"
+
+          # Initialize git repository if not already set up
+          if [ ! -d ".git" ]; then
+            git init
+            git remote add origin git@github.com:WeDigIT-Tech-pvt-ltd/eazyemailer.git
+          fi
+
+          # Pull latest changes
+          git pull origin main
+
+          # Install dependencies
+          pnpm install --force
+
+          #Build
+          pnpm build
+
+          # Restart server with pm2
+          pm2 stop all || true
+          pm2 start npm --name ezemailer-app -- run start -- -p 3000
+          EOF
+
+          # Cleanup
+          rm -f private_key.pem
