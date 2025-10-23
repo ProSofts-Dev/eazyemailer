@@ -4,7 +4,7 @@ EazyEmailer is a **Next.js**-based email automation SaaS that allows startups an
 
 # DEMO
 
-https://www.youtube.com/watch?v=EDd-JdfhL7Q
+<a href="https://www.youtube.com/watch?v=EDd-JdfhL7Q"><img width="1657" height="900" alt="create-campaign" src="https://github.com/user-attachments/assets/0d47f051-14e5-494e-b776-7ecae25b27a1" /></a>
 
 ## 📂 Folder Structure
 
