@@ -2,6 +2,10 @@
 
 EazyEmailer is a **Next.js**-based email automation SaaS that allows startups and entrepreneurs to send bulk emails efficiently at scale. It uses **PostgreSQL** with **Drizzle ORM**, **Tailwind CSS** for styling, and is hosted on **AWS EC2** with deployment automation via **GitHub Actions**.
 
+# DEMO
+
+https://www.youtube.com/watch?v=EDd-JdfhL7Q
+
 ## 📂 Folder Structure
 
 ```
